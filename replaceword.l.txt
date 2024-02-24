@@ -1,0 +1,43 @@
+%{
+#include <stdio.h>
+#include <string.h>
+%}
+
+%%
+"old_word"    { printf("new_word"); }  // Replace "old_word" with "new_word"
+.             { putchar(yytext[0]); }   // Print other characters as is
+%%
+
+int main(int argc, char *argv[]) {
+    if (argc != 4) {
+        printf("Usage: %s input_file output_file old_word new_word\n", argv[0]);
+        return 1;
+    }
+
+    FILE *input = fopen(argv[1], "r");
+    if (!input) {
+        printf("Error opening input file.\n");
+        return 1;
+    }
+
+    FILE *output = fopen(argv[2], "w");
+    if (!output) {
+        printf("Error opening output file.\n");
+        fclose(input);
+        return 1;
+    }
+
+    char old_word[100], new_word[100];
+    strcpy(old_word, argv[3]);
+    strcpy(new_word, argv[4]);
+
+    yyin = input;
+    yyout = output;
+
+    yylex();
+
+    fclose(input);
+    fclose(output);
+
+    return 0;
+}
